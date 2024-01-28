@@ -3,14 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class FinishLine : MonoBehaviour
 {
-    [SerializeField] private float _loadDelay = 1f;
+    [SerializeField] private float _loadDelay = 0.5f;
     [SerializeField] private string _sceneToLoad;
+    [SerializeField] private ParticleSystem _finishEffect;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            Debug.Log("Finish!");
+            _finishEffect.Play();
+            GetComponent<AudioSource>().Play();
             Invoke("LoadNextScene", _loadDelay);
         }
     }
@@ -19,4 +21,5 @@ public class FinishLine : MonoBehaviour
     {
         SceneManager.LoadScene(_sceneToLoad);
     }
+
 }

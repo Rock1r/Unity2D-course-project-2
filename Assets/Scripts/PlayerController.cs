@@ -1,31 +1,72 @@
+using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float _torque = 1f;
-
     private string horizontal = "Horizontal";
+
+    [SerializeField] private float _torque = 1f;
+    [SerializeField] private float _boostSpeed;
+
+    private bool _canMove = true;
+    private float _startSpeed;
+
     private Rigidbody2D _rb;
-    // Start is called before the first frame update
+    private SurfaceEffector2D _effector;
+
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _effector = FindObjectOfType<SurfaceEffector2D>();
+        _startSpeed = _effector.speed;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (_rb != null)
+        if (_canMove)
         {
-            float inputHorizontal = Input.GetAxis(horizontal) * _torque * Time.deltaTime;
-            if (inputHorizontal < 0f)
+            RotatePlayer();
+            RespondToBoost();
+        }
+    }
+
+    private void RespondToBoost()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            if (_effector.speed < _boostSpeed)
             {
-            _rb.AddTorque(_torque);
+            _effector.speed = _boostSpeed;
             }
-            else if (inputHorizontal > 0f)
+        }
+        else
+        {
+            if (_effector.speed > _boostSpeed)
             {
-                _rb.AddTorque(-_torque);
             }
+            else
+            {
+            _effector.speed = _startSpeed;
+            }
+        }
+    }
+
+    public void DisableControls()
+    {
+        _canMove = false;
+    }
+
+    private void RotatePlayer()
+    {
+        float inputHorizontal = Input.GetAxis(horizontal) * _torque * Time.deltaTime;
+
+        if (inputHorizontal < 0f)
+        {
+            _rb.AddTorque(_torque * Time.deltaTime);
+        }
+        else if (inputHorizontal > 0f)
+        {
+                _rb.AddTorque(-_torque * Time.deltaTime);
         }
     }
 }
